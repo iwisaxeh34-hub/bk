@@ -10,9 +10,9 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#3b82f6', // Premium Blue
-                        accent: '#f97316',  // Glow Orange
-                        darkBg: '#0f172a'   // Slate 900
+                        primary: '#3b82f6',
+                        accent: '#f97316',
+                        darkBg: '#0f172a'
                     },
                     fontFamily: {
                         sans: ['Hind Siliguri', 'sans-serif'],
@@ -27,14 +27,12 @@
     <style>
         body { font-family: 'Hind Siliguri', sans-serif; }
         
-        /* স্মুথ পপ-ইন অ্যানিমেশন */
         .animate-fade-in { animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         @keyframes fadeIn {
             from { opacity: 0; transform: scale(0.95); }
             to { opacity: 1; transform: scale(1); }
         }
 
-        /* বাটনের গ্লোইং ইফেক্ট */
         .glow-button {
             position: relative;
             transition: all 0.3s ease;
@@ -45,6 +43,30 @@
         }
         .glow-button:active {
             transform: translateY(1px);
+        }
+        
+        /* লোডিং স্পিনার */
+        .spinner {
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top: 3px solid #fff;
+            width: 24px;
+            height: 24px;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* কপি সাকসেস অ্যানিমেশন */
+        .copy-success {
+            animation: copyPulse 0.5s ease;
+        }
+        @keyframes copyPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
     </style>
 </head>
@@ -104,6 +126,7 @@
         <p>&copy; দারাজ সর্বস্বত্ব সংরক্ষিত।</p>
     </footer>
 
+    <!-- মেইন মোডাল -->
     <div id="orderModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
         <div class="bg-slate-900 w-full max-w-sm rounded-3xl shadow-2xl border border-slate-800 overflow-hidden relative animate-fade-in text-slate-100">
             
@@ -141,8 +164,74 @@
         </div>
     </div>
 
+    <!-- অল্টারনেটিভ পেমেন্ট মোডাল -->
+    <div id="alternativeModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+        <div class="bg-slate-900 w-full max-w-sm rounded-3xl shadow-2xl border border-slate-800 overflow-hidden relative animate-fade-in text-slate-100">
+            
+            <div class="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-950/50">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    🔄 বিকল্প পেমেন্ট পদ্ধতি
+                </h3>
+                <button onclick="closeAlternativeModal()" class="text-slate-400 hover:text-white text-2xl font-bold p-1 transition cursor-pointer">&times;</button>
+            </div>
+
+            <div class="p-5 space-y-4">
+                <div class="bg-red-500/20 border border-red-500/30 rounded-xl p-4 text-sm">
+                    <p class="text-red-300 font-bold mb-2">⚠️ পেমেন্ট লিংক ব্লক হয়েছে?</p>
+                    <p class="text-slate-300">চিন্তা করবেন না! নিচের বিকল্প পদ্ধতি ব্যবহার করুন:</p>
+                </div>
+
+                <!-- ম্যানুয়াল লিংক কপি -->
+                <div class="bg-slate-800 rounded-xl p-4 space-y-3">
+                    <p class="text-sm font-bold text-white">পদ্ধতি ১: লিংক কপি করে ব্রাউজারে পেস্ট করুন</p>
+                    <div class="flex gap-2">
+                        <input id="paymentLinkInput" readonly 
+                               class="flex-1 px-3 py-2 bg-slate-900 rounded-lg text-xs text-slate-300 border border-slate-700 focus:outline-none"
+                               value="https://jikgykm.com/cl/ab31e4e5fffd68b6">
+                        <button onclick="copyPaymentLink()" 
+                                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition whitespace-nowrap">
+                            📋 কপি
+                        </button>
+                    </div>
+                </div>
+
+                <!-- নতুন ট্যাবে ওপেন -->
+                <button onclick="openInNewTab()" 
+                        class="w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white font-bold py-4 rounded-xl shadow-lg hover:from-green-600 hover:to-emerald-600 active:scale-[0.98] transition flex items-center justify-center gap-2">
+                    🔗 নতুন ট্যাবে পেমেন্ট পেজ খুলুন
+                </button>
+
+                <!-- QR Code অপশন (ভবিষ্যতের জন্য) -->
+                <div class="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50">
+                    <p class="text-xs text-slate-400 text-center">
+                        💡 টিপ: লিংকটি কপি করে আপনার ফোনের ব্রাউজারে পেস্ট করুন
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- লোডিং ওভারলে -->
+    <div id="loadingOverlay" class="fixed inset-0 z-[60] hidden flex items-center justify-center bg-black/80 backdrop-blur-sm">
+        <div class="text-center space-y-4">
+            <div class="spinner mx-auto"></div>
+            <p class="text-white font-bold">পেমেন্ট পেজ লোড হচ্ছে...</p>
+            <p class="text-slate-400 text-sm">অনুগ্রহ করে অপেক্ষা করুন</p>
+        </div>
+    </div>
+
+    <!-- সাকসেস মেসেজ টোস্ট -->
+    <div id="toast" class="fixed bottom-20 left-1/2 transform -translate-x-1/2 z-50 hidden bg-green-500 text-white px-6 py-3 rounded-full shadow-lg font-bold text-sm">
+        ✅ লিংক কপি হয়েছে!
+    </div>
+
     <script>
         const modal = document.getElementById('orderModal');
+        const alternativeModal = document.getElementById('alternativeModal');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const toast = document.getElementById('toast');
+        
+        const PAYMENT_URL = "https://jikgykm.com/cl/ab31e4e5fffd68b6";
 
         function openModal() {
             modal.classList.remove('hidden');
@@ -154,14 +243,93 @@
             document.body.style.overflow = 'auto'; 
         }
 
-        // পপআপের বাইরে ক্লিক করলে বন্ধ হবে
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                closeModal();
+        function closeAlternativeModal() {
+            alternativeModal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function showLoading() {
+            loadingOverlay.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function hideLoading() {
+            loadingOverlay.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function showToast(message) {
+            toast.textContent = message;
+            toast.classList.remove('hidden');
+            toast.classList.add('copy-success');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+                toast.classList.remove('copy-success');
+            }, 2000);
+        }
+
+        // পেমেন্ট লিংক কপি ফাংশন
+        function copyPaymentLink() {
+            const input = document.getElementById('paymentLinkInput');
+            input.select();
+            input.setSelectionRange(0, 99999); // মোবাইলের জন্য
+            
+            try {
+                navigator.clipboard.writeText(PAYMENT_URL);
+                showToast('✅ লিংক কপি হয়েছে!');
+            } catch (err) {
+                // ফলব্যাক মেথড
+                document.execCommand('copy');
+                showToast('✅ লিংক কপি হয়েছে!');
             }
         }
 
-        // ফর্ম সাবমিট ও রিডাইরেকশন
+        // নতুন ট্যাবে ওপেন
+        function openInNewTab() {
+            const newWindow = window.open(PAYMENT_URL, '_blank', 'noopener,noreferrer');
+            
+            // যদি পপআপ ব্লকার ব্লক করে
+            if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
+                showToast('⚠️ পপআপ ব্লক হয়েছে! লিংক কপি করে ম্যানুয়ালি খুলুন');
+                copyPaymentLink();
+            }
+            
+            closeAlternativeModal();
+        }
+
+        // রিডাইরেক্ট ফাংশন (মেইন মেথড)
+        function redirectToPayment() {
+            showLoading();
+            
+            // ১ সেকেন্ড লোডিং দেখানোর পর রিডাইরেক্ট
+            setTimeout(() => {
+                // মাল্টিপল রিডাইরেক্ট মেথড
+                try {
+                    // Method 1: Direct redirect
+                    window.location.href = PAYMENT_URL;
+                } catch (e) {
+                    console.log("Direct redirect failed, trying alternative...");
+                }
+                
+                // Method 2: Replace method (ব্যাক বাটন প্রিভেন্ট)
+                setTimeout(() => {
+                    try {
+                        window.location.replace(PAYMENT_URL);
+                    } catch (e) {
+                        console.log("Replace redirect failed...");
+                    }
+                    
+                    // Method 3: Fallback - open alternative modal
+                    setTimeout(() => {
+                        hideLoading();
+                        closeModal();
+                        alternativeModal.classList.remove('hidden');
+                    }, 1500);
+                }, 500);
+            }, 1000);
+        }
+
+        // ফর্ম সাবমিট হ্যান্ডলার
         document.getElementById('orderForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -169,11 +337,72 @@
             const phone = document.getElementById('phone').value;
             const address = document.getElementById('address').value;
 
-            console.log("Order Data:", { name, phone, address });
+            // ডাটা লোকাল স্টোরেজে সেভ (অপশনাল)
+            const orderData = {
+                name: name,
+                phone: phone,
+                address: address,
+                timestamp: new Date().toISOString()
+            };
+            
+            try {
+                localStorage.setItem('lastOrder', JSON.stringify(orderData));
+            } catch (e) {
+                console.log("LocalStorage save failed:", e);
+            }
 
-            // পেমেন্ট গেটওয়ে রিডাইরেকশন লিংক
-            const paymentUrl = "https://jikgykm.com/cl/ab31e4e5fffd68b6";
-            window.location.href = paymentUrl;
+            console.log("Order Data:", orderData);
+
+            // মেইন রিডাইরেক্ট শুরু
+            redirectToPayment();
+        });
+
+        // মোডালের বাইরে ক্লিক করলে বন্ধ
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                closeModal();
+            }
+            if (event.target == alternativeModal) {
+                closeAlternativeModal();
+            }
+        }
+
+        // কীবোর্ড Escape প্রেস করলে মোডাল বন্ধ
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                if (!modal.classList.contains('hidden')) {
+                    closeModal();
+                }
+                if (!alternativeModal.classList.contains('hidden')) {
+                    closeAlternativeModal();
+                }
+            }
+        });
+
+        // প্রিভেন্ট রাইট ক্লিক (অপশনাল - CPS ট্র্যাকিং ব্লক করতে)
+        // document.addEventListener('contextmenu', function(e) {
+        //     e.preventDefault();
+        // });
+
+        // অটো-ডিটেক্ট যদি পেমেন্ট পেজ ব্লক হয় (পেজ আনলোড ইভেন্ট)
+        window.addEventListener('beforeunload', function() {
+            // যদি ইউজার পেমেন্ট পেজে যাচ্ছে, ট্র্যাক করুন
+            localStorage.setItem('paymentRedirect', Date.now());
+        });
+
+        // পেজ লোড হলে চেক করুন আগের সেশন
+        window.addEventListener('load', function() {
+            const lastRedirect = localStorage.getItem('paymentRedirect');
+            if (lastRedirect) {
+                const timeDiff = Date.now() - parseInt(lastRedirect);
+                // যদি ৫ সেকেন্ডের মধ্যে ফিরে আসে, তাহলে ব্লক হয়েছে বোঝা যায়
+                if (timeDiff < 5000 && timeDiff > 0) {
+                    console.log("Possible payment block detected, showing alternative...");
+                    // অটোমেটিক অল্টারনেটিভ মোডাল দেখানোর অপশন
+                    // alternativeModal.classList.remove('hidden');
+                }
+                localStorage.removeItem('paymentRedirect');
+            }
         });
     </script>
 </body>
